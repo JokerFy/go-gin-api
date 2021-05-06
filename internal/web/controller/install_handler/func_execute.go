@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"runtime"
 
 	"github.com/xinliangnote/go-gin-api/configs"
 	"github.com/xinliangnote/go-gin-api/internal/api/code"
@@ -44,16 +43,16 @@ func (h *handler) Execute() core.HandlerFunc {
 			return
 		}
 
-		versionStr := runtime.Version()
-		version := cast.ToFloat32(versionStr[2:])
-		if version < 1.15 {
-			c.AbortWithError(errno.NewError(
-				http.StatusBadRequest,
-				code.ConfigGoVersionError,
-				code.Text(code.ConfigGoVersionError)),
-			)
-			return
-		}
+		/*		versionStr := runtime.Version()
+				version := cast.ToFloat32(versionStr[2:])
+				if version < 1.15 {
+					c.AbortWithError(errno.NewError(
+						http.StatusBadRequest,
+						code.ConfigGoVersionError,
+						code.Text(code.ConfigGoVersionError)),
+					)
+					return
+				}*/
 
 		outPutString := ""
 

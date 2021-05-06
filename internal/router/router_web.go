@@ -8,6 +8,7 @@ import (
 	"github.com/xinliangnote/go-gin-api/internal/web/controller/gencode_handler"
 	"github.com/xinliangnote/go-gin-api/internal/web/controller/index_handler"
 	"github.com/xinliangnote/go-gin-api/internal/web/controller/install_handler"
+	"github.com/xinliangnote/go-gin-api/internal/web/controller/template_handler"
 	"github.com/xinliangnote/go-gin-api/internal/web/controller/tool_handler"
 )
 
@@ -21,6 +22,7 @@ func setWebRouter(r *resource) {
 	authorizedHandler := authorized_handler.New(r.logger, r.db, r.cache)
 	toolHandler := tool_handler.New(r.logger, r.db, r.cache)
 	adminHandler := admin_handler.New(r.logger, r.db, r.cache)
+	templateHandler := template_handler.New(r.logger, r.db, r.cache)
 
 	web := r.mux.Group("", r.middles.DisableLog())
 	{
@@ -59,6 +61,8 @@ func setWebRouter(r *resource) {
 		web.GET("/admin/modify_info", adminHandler.ModifyInfoView())
 		web.GET("/login", adminHandler.LoginView())
 		web.GET("/admin/menu", adminHandler.MenuView())
+
+		web.GET("/template/gen", templateHandler.View())
 
 		// 工具箱
 		web.GET("/tool/hashids", toolHandler.HashIdsView())

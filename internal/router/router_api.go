@@ -5,6 +5,7 @@ import (
 	"github.com/xinliangnote/go-gin-api/internal/api/controller/authorized_handler"
 	"github.com/xinliangnote/go-gin-api/internal/api/controller/config_handler"
 	"github.com/xinliangnote/go-gin-api/internal/api/controller/menu_handler"
+	"github.com/xinliangnote/go-gin-api/internal/api/controller/template_handler"
 	"github.com/xinliangnote/go-gin-api/internal/api/controller/tool_handler"
 	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
 )
@@ -21,7 +22,7 @@ func setApiRouter(r *resource) {
 	}
 
 	// api
-	api := r.mux.Group("/api", core.WrapAuthHandler(r.middles.Token), r.middles.Signature())
+	api := r.mux.Group("/api", core.WrapAuthHandler(r.middles.Token))
 	{
 		// authorized
 		authorizedHandler := authorized_handler.New(r.logger, r.db, r.cache)
@@ -61,6 +62,11 @@ func setApiRouter(r *resource) {
 		api.GET("/tool/data/dbs", toolHandler.Dbs())
 		api.POST("/tool/data/tables", toolHandler.Tables())
 		api.POST("/tool/data/mysql", toolHandler.SearchMySQL())
+
+		//template
+		templateHandler := template_handler.New(r.logger, r.db, r.cache)
+		api.GET("/template/data/dbs", templateHandler.Dbs())
+		api.POST("/template/data/tables", templateHandler.Tables())
 
 		// config
 		configHandler := config_handler.New(r.logger, r.db, r.cache)

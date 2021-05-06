@@ -145,6 +145,10 @@ func main() {
 
 }
 
+func genServiceFile(tableName string) {
+
+}
+
 func queryTables(db *gorm.DB, dbName string, tableName string) ([]tableInfo, error) {
 	var tableCollect []tableInfo
 	var tableArray []string
@@ -294,4 +298,57 @@ func textType(s string) string {
 		"longtext":   "string",
 	}
 	return mysqlTypeToGoType[s]
+}
+
+func QueryTables(db *gorm.DB, dbName string, tableName string) ([]tableInfo, error) {
+	var tableCollect []tableInfo
+	var tableArray []string
+	var commentArray []sql.NullString
+
+	sqlTables := fmt.Sprintf("SELECT `table_name`,`table_comment` FROM `information_schema`.`tables` WHERE `table_schema`= '%s'", dbName)
+	rows, err := db.Raw(sqlTables).Rows()
+	if err != nil {
+		return tableCollect, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var info tableInfo
+		err = rows.Scan(&info.Name, &info.Comment)
+		if err != nil {
+			fmt.Printf("execute query tables action error,had ignored, detail is [%v]\n", err.Error())
+			continue
+		}
+
+		tableCollect = append(tableCollect, info)
+		tableArray = append(tableArray, info.Name)
+		commentArray = append(commentArray, info.Comment)
+	}
+
+	// filter tables when specified tables params
+	if tableName != "*" {
+		tableCollect = nil
+		chooseTables := strings.Split(tableName, ",")
+		indexMap := make(map[int]int)
+		for _, item := range chooseTables {
+			subIndexMap := getTargetIndexMap(tableArray, item)
+			for k, v := range subIndexMap {
+				if _, ok := indexMap[k]; ok {
+					continue
+				}
+				indexMap[k] = v
+			}
+		}
+
+		if len(indexMap) != 0 {
+			for _, v := range indexMap {
+				var info tableInfo
+				info.Name = tableArray[v]
+				info.Comment = commentArray[v]
+				tableCollect = append(tableCollect, info)
+			}
+		}
+	}
+
+	return tableCollect, err
 }
