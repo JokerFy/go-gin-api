@@ -1,17 +1,14 @@
 package template_handler
 
 import (
-	"bytes"
 	"fmt"
-	"net/http"
-	"os/exec"
-	"runtime"
-
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/xinliangnote/go-gin-api/cmd/mysqlmd/mysql"
 	"github.com/xinliangnote/go-gin-api/internal/api/code"
 	"github.com/xinliangnote/go-gin-api/internal/api/service/database_service"
 	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
 	"github.com/xinliangnote/go-gin-api/pkg/errno"
+	"net/http"
 )
 
 type tablesRequest struct {
@@ -55,6 +52,10 @@ func (h *handler) Tables() core.HandlerFunc {
 		searchOneData := new(database_service.SearchData)
 		searchOneData.DataBaseName = req.DbName
 		databaseList, _ := h.databaseService.List(c, searchOneData)
+		fmt.Print(databaseList)
+		/*		templateInfo,_ := h.templateService.Detail(c,1)
+				fmt.Print(templateInfo)*/
+
 		if len(databaseList) < 1 {
 
 		} else {
@@ -68,28 +69,29 @@ func (h *handler) Tables() core.HandlerFunc {
 				res.List = append(res.List, info)
 			}
 
+			templateInfo, _ := h.templateService.GenGormStruct(c)
+			res.GormData = templateInfo
 			if req.Gen {
-				shellPath := fmt.Sprintf("./scripts/gormgen.sh %s %s %s %s %s", databaseList[0].Addr, databaseList[0].Account, databaseList[0].Password, databaseList[0].Name, "attribute")
 
-				// runtime.GOOS = linux or darwin
-				command := exec.Command("/bin/bash", "-c", shellPath)
-				if runtime.GOOS == "windows" {
-					command = exec.Command("cmd", "/C", shellPath)
-				}
+				/*				shellPath := fmt.Sprintf("./scripts/gormgen.sh %s %s %s %s %s", databaseList[0].Addr, databaseList[0].Account, databaseList[0].Password, databaseList[0].Name, "attribute")
 
-				var stderr bytes.Buffer
-				command.Stderr = &stderr
+								// runtime.GOOS = linux or darwin
+								command := exec.Command("/bin/bash", "-c", shellPath)
+								if runtime.GOOS == "windows" {
+									command = exec.Command("cmd", "/C", shellPath)
+								}
 
-				output, err := command.Output()
-				fmt.Print(output)
-				if err != nil {
-					c.Payload(stderr.String())
-					return
-				}
+								var stderr bytes.Buffer
+								command.Stderr = &stderr
+
+								output, err := command.Output()
+								fmt.Print(output)
+								if err != nil {
+									c.Payload(stderr.String())
+									return
+								}*/
 			}
-
-			c.Payload(res)
 		}
-
+		c.Payload(res)
 	}
 }

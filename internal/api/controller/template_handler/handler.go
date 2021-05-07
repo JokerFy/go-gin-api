@@ -3,6 +3,7 @@ package template_handler
 import (
 	"github.com/xinliangnote/go-gin-api/configs"
 	"github.com/xinliangnote/go-gin-api/internal/api/service/database_service"
+	"github.com/xinliangnote/go-gin-api/internal/api/service/template_service"
 	"github.com/xinliangnote/go-gin-api/internal/pkg/cache"
 	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
 	"github.com/xinliangnote/go-gin-api/internal/pkg/db"
@@ -32,6 +33,7 @@ type handler struct {
 	cache           cache.Repo
 	hashids         hash.Hash
 	databaseService database_service.Service
+	templateService template_service.Service
 }
 
 func New(logger *zap.Logger, db db.Repo, cache cache.Repo) Handler {
@@ -41,6 +43,7 @@ func New(logger *zap.Logger, db db.Repo, cache cache.Repo) Handler {
 		cache:           cache,
 		hashids:         hash.New(configs.Get().HashIds.Secret, configs.Get().HashIds.Length),
 		databaseService: database_service.New(db, cache),
+		templateService: template_service.New(db, cache),
 	}
 }
 
