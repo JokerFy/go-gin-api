@@ -12,8 +12,9 @@ import (
 )
 
 type tablesRequest struct {
-	DbName string `form:"db_name"` // 数据库名称
-	Gen    bool   `form:"gen"`
+	DbName    string `form:"db_name"`    // 数据库名称
+	TableName string `form:"tabel_name"` // 数据库名称
+	Gen       bool   `form:"gen"`
 }
 
 type tablesResponse struct {
@@ -69,8 +70,8 @@ func (h *handler) Tables() core.HandlerFunc {
 				res.List = append(res.List, info)
 			}
 
-			templateInfo, _ := h.templateService.GenGormStruct(c)
-			res.GormData = templateInfo
+			/*		templateInfo, _ := h.templateService.GenGormStruct(c)
+					res.GormData = templateInfo*/
 			if req.Gen {
 
 				/*				shellPath := fmt.Sprintf("./scripts/gormgen.sh %s %s %s %s %s", databaseList[0].Addr, databaseList[0].Account, databaseList[0].Password, databaseList[0].Name, "attribute")

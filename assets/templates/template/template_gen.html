@@ -37,7 +37,7 @@
                                 <div class="input-group-prepend">
                                     <span class="input-group-text">数据表</span>
                                 </div>
-                                <select class="form-control select-picker col-lg-2" data-width="auto"
+                                <select class="form-control select-picker2 col-lg-2" data-width="auto"
                                         data-live-search="true" id="table">
                                 </select>
                             </div>
@@ -112,7 +112,6 @@
 
                 $("#db option:eq(0)").attr('selected', 'selected');//选中第一个
                 $("#db").selectpicker('refresh');
-
                 getTables($('#db option:selected').val());
             },
             function (response) {
@@ -143,6 +142,10 @@
 
         $("#db").on('change', function () {
             getTables($(this).val());
+        });
+
+        $("#table").on('change', function () {
+            genTableContent($('#db option:selected').val(),$(this).val());
         });
 
         $('#btnSearch').on('click', function () {
@@ -218,11 +221,11 @@
 
         });
 
-        function getTables(db_name,id,isGen) {
+        function getTables(db_name,id,isGen,tableName) {
             AjaxForm(
                 "POST",
                 "/api/template/data/tables",
-                {db_name: db_name,id:id,gen:isGen},
+                {db_name: db_name,id:id,gen:isGen,table_name:tableName},
                 function () {
                 },
                 function (data) {
@@ -240,6 +243,26 @@
                 }
             );
         }
+
+        function genTableContent(db_name,tableName) {
+            console.log(db_name)
+            console.log(tableName)
+            AjaxForm(
+                "POST",
+                "/api/template/data/genContent",
+                {db_name: db_name,table_name:tableName},
+                function () {
+                },
+                function (data) {
+                    console.log(data)
+                    $("#home-basic>pre").text(data.gorm_data)
+                },
+                function (response) {
+                    AjaxError(response);
+                }
+            );
+        }
+
     })
 </script>
 </body>

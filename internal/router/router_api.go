@@ -67,6 +67,7 @@ func setApiRouter(r *resource) {
 		templateHandler := template_handler.New(r.logger, r.db, r.cache)
 		api.GET("/template/data/dbs", templateHandler.Dbs())
 		api.POST("/template/data/tables", templateHandler.Tables())
+		api.POST("/template/data/genContent", templateHandler.GenContent())
 
 		// config
 		configHandler := config_handler.New(r.logger, r.db, r.cache)

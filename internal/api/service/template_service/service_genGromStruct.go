@@ -5,12 +5,13 @@ import (
 	"fmt"
 	"github.com/jmoiron/sqlx"
 	"github.com/xinliangnote/go-gin-api/internal/api/repository/db_repo"
+	"github.com/xinliangnote/go-gin-api/internal/api/repository/db_repo/database_repo"
 	"github.com/xinliangnote/go-gin-api/internal/api/repository/db_repo/template_repo"
 	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
 	"strings"
 )
 
-func (s *service) GenGormStruct(ctx core.Context) (res string, err error) {
+func (s *service) GenGormStruct(ctx core.Context, dbInfo *database_repo.Database, tableName string) (res string, err error) {
 	qb := template_repo.NewQueryBuilder()
 	qb.WhereId(db_repo.EqualPredicate, 1)
 	/*	info, err := qb.QueryOne(s.db.GetDbR().WithContext(ctx.RequestContext()))
@@ -18,13 +19,13 @@ func (s *service) GenGormStruct(ctx core.Context) (res string, err error) {
 			return "", err
 		}*/
 	//res = info.ModelTemplate
-	res = genGormStruct("attribute", "go_gin_api")
+	res = genGormStruct(tableName, dbInfo)
 	return res, nil
 }
 
 //生成gorm结构体
-func genGormStruct(tableName, database string) string {
-	dns := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", "root", "123456", "host.docker.internal:3306", "information_schema")
+func genGormStruct(tableName string, dbInfo *database_repo.Database) string {
+	dns := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8", dbInfo.Account, dbInfo.Password, dbInfo.Addr+":"+fmt.Sprintf("%v", dbInfo.Ports), "information_schema")
 	db := sqlx.MustConnect("mysql", dns)
 	defer db.Close()
 	type FieldInfo struct {
@@ -34,7 +35,7 @@ func genGormStruct(tableName, database string) string {
 		IsNullable string `db:"IS_NULLABLE"`
 	}
 	var fs []FieldInfo
-	err := db.Select(&fs, "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT, IS_NULLABLE FROM COLUMNS WHERE TABLE_NAME=? and table_schema=?", tableName, database)
+	err := db.Select(&fs, "SELECT COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT, IS_NULLABLE FROM COLUMNS WHERE TABLE_NAME=? and table_schema=?", tableName, dbInfo.Name)
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
@@ -99,9 +100,9 @@ func genGormStruct(tableName, database string) string {
 		}
 		buffer.WriteString(`}`)
 		TplStructDefine = buffer.String()
-		fmt.Print("12312312321311111111111111111111111111111111111111111111111111111111111")
-		fmt.Print(TplStructDefine)
 	}
+	fmt.Sprintf("!232131222222222222222222222222222222")
+	fmt.Sprintf(TplStructDefine)
 	return TplStructDefine
 }
 

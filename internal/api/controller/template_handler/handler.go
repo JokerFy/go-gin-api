@@ -25,6 +25,9 @@ type Handler interface {
 	// @Tags API.tool
 	// @Router /api/tool/data/tables [post]
 	Tables() core.HandlerFunc
+
+	// GenContent 根据表生成代码
+	GenContent() core.HandlerFunc
 }
 
 type handler struct {

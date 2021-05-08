@@ -2,6 +2,7 @@ package template_service
 
 import (
 	"github.com/xinliangnote/go-gin-api/configs"
+	"github.com/xinliangnote/go-gin-api/internal/api/repository/db_repo/database_repo"
 	"github.com/xinliangnote/go-gin-api/internal/api/repository/db_repo/template_repo"
 	"github.com/xinliangnote/go-gin-api/internal/pkg/cache"
 	"github.com/xinliangnote/go-gin-api/internal/pkg/core"
@@ -20,7 +21,7 @@ type Service interface {
 	PageList(ctx core.Context, searchData *SearchData) (listData []*template_repo.Template, err error)
 	PageListCount(ctx core.Context, searchData *SearchData) (total int64, err error)
 	ListAPI(ctx core.Context, searchAPIData *SearchAPIData) (listData []*template_repo.Template, err error)
-	GenGormStruct(ctx core.Context) (res string, err error)
+	GenGormStruct(ctx core.Context, dbInfo *database_repo.Database, tableName string) (res string, err error)
 }
 
 type service struct {
